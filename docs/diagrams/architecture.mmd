@@ -1,0 +1,8 @@
+flowchart LR
+    User[Пользователь Telegram] --> Bot[Telegram-бот]
+    Admin[Администратор] --> AdminPanel[Веб-панель администратора]
+    Reader[Читатель] --> PublicSite[Публичный сайт]
+    Bot --> API[FastAPI backend]
+    AdminPanel --> API
+    PublicSite --> API
+    API --> DB[(PostgreSQL / SQLite)]

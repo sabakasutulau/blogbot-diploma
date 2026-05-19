@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero compact">
+  <p class="eyebrow">Панель администратора</p>
+  <h1>Управление публикациями</h1>
+  <p>Введите токен администратора из `.env`, чтобы создавать и публиковать посты.</p>
+</section>
+
+<section class="admin-grid">
+  <form id="postForm" class="card form-card">
+    <label>Токен администратора
+      <input id="token" type="password" placeholder="ADMIN_TOKEN">
+    </label>
+    <label>Заголовок
+      <input id="title" type="text" minlength="3" required>
+    </label>
+    <label>Текст
+      <textarea id="body" minlength="10" rows="8" required></textarea>
+    </label>
+    <label class="checkbox">
+      <input id="publishNow" type="checkbox"> Опубликовать сразу
+    </label>
+    <button type="submit" class="button">Создать пост</button>
+    <p id="formResult" class="status"></p>
+  </form>
+
+  <section class="card">
+    <div class="panel-header">
+      <h2>Все посты</h2>
+      <button id="reload" class="button secondary">Обновить</button>
+    </div>
+    <div id="posts"></div>
+  </section>
+</section>
+
+<script>
+const tokenInput = document.querySelector('#token');
+const titleInput = document.querySelector('#title');
+const bodyInput = document.querySelector('#body');
+const publishNowInput = document.querySelector('#publishNow');
+const form = document.querySelector('#postForm');
+const result = document.querySelector('#formResult');
+const postsEl = document.querySelector('#posts');
+const reloadBtn = document.querySelector('#reload');
+
+tokenInput.value = localStorage.getItem('adminToken') || '';
+
+const actionHeaders = () => ({
+  'Content-Type': 'application/json',
+  'X-Admin-Token': tokenInput.value
+});
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('\"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+async function loadPosts() {
+  postsEl.innerHTML = '<p>Загрузка...</p>';
+  const response = await fetch('/api/posts');
+  const posts = await response.json();
+  if (!posts.length) {
+    postsEl.innerHTML = '<p>Постов пока нет.</p>';
+    return;
+  }
+  postsEl.innerHTML = posts.map(post => `
+    <article class="admin-post">
+      <div>
+        <strong>${escapeHtml(post.title)}</strong>
+        <p>${escapeHtml(post.status)} · #${post.id}</p>
+      </div>
+      <div class="actions">
+        ${post.status !== 'published' ? `<button data-publish="${post.id}">Опубликовать</button>` : `<a href="/post/${escapeHtml(post.slug)}" target="_blank">Открыть</a>`}
+        <button data-delete="${post.id}">Удалить</button>
+      </div>
+    </article>
+  `).join('');
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  localStorage.setItem('adminToken', tokenInput.value);
+  result.textContent = 'Создание...';
+  const response = await fetch('/api/posts', {
+    method: 'POST',
+    headers: actionHeaders(),
+    body: JSON.stringify({
+      title: titleInput.value,
+      body: bodyInput.value,
+      status: publishNowInput.checked ? 'published' : 'draft',
+      author_name: 'Администратор'
+    })
+  });
+  if (!response.ok) {
+    result.textContent = 'Ошибка: проверьте токен и данные.';
+    return;
+  }
+  titleInput.value = '';
+  bodyInput.value = '';
+  result.textContent = 'Пост создан.';
+  await loadPosts();
+});
+
+postsEl.addEventListener('click', async (event) => {
+  const publishId = event.target.dataset.publish;
+  const deleteId = event.target.dataset.delete;
+  if (publishId) {
+    await fetch(`/api/posts/${publishId}/publish`, { method: 'PATCH', headers: actionHeaders() });
+    await loadPosts();
+  }
+  if (deleteId && confirm('Удалить пост?')) {
+    await fetch(`/api/posts/${deleteId}`, { method: 'DELETE', headers: actionHeaders() });
+    await loadPosts();
+  }
+});
+
+reloadBtn.addEventListener('click', loadPosts);
+loadPosts();
+</script>
+{% endblock %}

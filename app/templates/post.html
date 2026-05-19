@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="post">
+  <p class="meta">{{ post.published_at.strftime('%d.%m.%Y %H:%M') if post.published_at else '' }}</p>
+  <h1>{{ post.title }}</h1>
+  <div class="post-body">{{ post.body | replace('\n', '<br>') | safe }}</div>
+  <p class="meta">Автор: {{ post.author_name or 'администратор' }}</p>
+</article>
+{% endblock %}

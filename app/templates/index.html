@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Публичная лента</p>
+  <h1>Блог, управляемый через Telegram-бота</h1>
+  <p>Посты создаются в боте или админ-панели, сохраняются в базе данных и публикуются на сайте.</p>
+</section>
+
+<section class="grid">
+  {% for post in posts %}
+  <article class="card">
+    <p class="meta">{{ post.published_at.strftime('%d.%m.%Y %H:%M') if post.published_at else 'без даты' }}</p>
+    <h2><a href="/post/{{ post.slug }}">{{ post.title }}</a></h2>
+    <p>{{ post.body[:220] }}{% if post.body|length > 220 %}...{% endif %}</p>
+    <a class="button" href="/post/{{ post.slug }}">Читать</a>
+  </article>
+  {% else %}
+  <article class="card empty">
+    <h2>Пока нет опубликованных постов</h2>
+    <p>Создайте первый пост через Telegram-бота или админ-панель.</p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

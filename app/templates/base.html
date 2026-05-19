@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_name }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a href="/" class="brand">{{ app_name }}</a>
+  <nav>
+    <a href="/">Лента</a>
+    <a href="/admin">Админ-панель</a>
+    <a href="/docs">API</a>
+  </nav>
+</header>
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+<footer class="footer">Дипломный проект. Telegram-бот, API, база данных и веб-интерфейс.</footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant U as Автор
+    participant B as Telegram-бот
+    participant A as FastAPI
+    participant D as База данных
+    U->>B: /newpost
+    B->>U: Запрос заголовка
+    U->>B: Заголовок
+    B->>U: Запрос текста
+    U->>B: Текст
+    B->>A: Создание черновика
+    A->>D: INSERT posts
+    D-->>A: ID записи
+    A-->>B: Запись создана
+    U->>B: Опубликовать
+    B->>A: PATCH /api/posts/{id}/publish
+    A->>D: UPDATE posts
+    A-->>B: Публичная ссылка

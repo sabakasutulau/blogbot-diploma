@@ -1,0 +1,52 @@
+{
+  "info": {
+    "name": "BlogBot Diploma API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "adminToken", "value": "change-me" },
+    { "key": "postId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "List published posts",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/posts?status=published"
+      }
+    },
+    {
+      "name": "Create draft post",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-Admin-Token", "value": "{{adminToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Первый пост\",\n  \"body\": \"Текст первого поста для проверки работы API.\",\n  \"status\": \"draft\",\n  \"author_name\": \"Администратор\"\n}"
+        },
+        "url": "{{baseUrl}}/api/posts"
+      }
+    },
+    {
+      "name": "Publish post",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "X-Admin-Token", "value": "{{adminToken}}" }
+        ],
+        "url": "{{baseUrl}}/api/posts/{{postId}}/publish"
+      }
+    },
+    {
+      "name": "Stats",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/stats"
+      }
+    }
+  ]
+}
