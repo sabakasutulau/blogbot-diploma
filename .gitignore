@@ -1,11 +1,22 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
-.venv/
-.env
+*.pyo
+*.pyd
 .pytest_cache/
+.coverage
+htmlcov/
 
-# Local database
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.local
+
+# Databases
 *.db
 *.sqlite
 *.sqlite3
@@ -17,3 +28,9 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Generated files
+db_preview.html
